@@ -18,58 +18,58 @@ bcrypt = Bcrypt()
 api_bp = Blueprint("api_bp", __name__)
 
 #################### dashboard ######################
-# @api_bp.route('/pie_chart_data')
-# @login_required
-# def pie_chart_data():
-#     sales_data = (
-#         db.session.query(
-#             Product.name,
-#             db.func.sum(DetailSale.amount).label('total_sold')
-#         )
-#         .join(DetailSale)
-#         .group_by(Product.id)
-#         .all()
-#     )
+@api_bp.route('/pie_chart_data')
+@login_required
+def pie_chart_data():
+    sales_data = (
+        db.session.query(
+            Product.name,
+            db.func.sum(DetailSale.amount).label('total_sold')
+        )
+        .join(DetailSale)
+        .group_by(Product.id)
+        .all()
+    )
 
-#     data = [
-#         {
-#             'name': product_name,
-#             'sales': int(total_sold or 0)
-#         }
-#         for product_name, total_sold in sales_data
-#     ]
+    data = [
+        {
+            'name': product_name,
+            'sales': int(total_sold or 0)
+        }
+        for product_name, total_sold in sales_data
+    ]
 
-#     return jsonify(data)
+    return jsonify(data)
 
-# @api_bp.route('/bar_chart_data')
-# @login_required
-# def bar_chart_data():
-#     sales_data = (
-#         db.session.query(
-#             db.func.date(Sale.sale_date).label('sale_date'),
-#             db.func.sum(DetailSale.amount).label('total_sold')
-#         )
-#         .join(DetailSale, DetailSale.sale_id == Sale.id)
-#         .group_by(db.func.date(Sale.sale_date))
-#         .order_by(db.func.date(Sale.sale_date))
-#         .all()
-#     )
+@api_bp.route('/bar_chart_data')
+@login_required
+def bar_chart_data():
+    sales_data = (
+        db.session.query(
+            db.func.date(Sale.sale_date).label('sale_date'),
+            db.func.sum(DetailSale.amount).label('total_sold')
+        )
+        .join(DetailSale, DetailSale.sale_id == Sale.id)
+        .group_by(db.func.date(Sale.sale_date))
+        .order_by(db.func.date(Sale.sale_date))
+        .all()
+    )
 
-#     data = [
-#         {
-#             'date': sale_date.strftime('%Y-%m-%d'),
-#             'total_stock_sold': int(total_sold or 0)
-#         }
-#         for sale_date, total_sold in sales_data
-#     ]
+    data = [
+        {
+            'date': sale_date.strftime('%Y-%m-%d'),
+            'total_stock_sold': int(total_sold or 0)
+        }
+        for sale_date, total_sold in sales_data
+    ]
 
-#     return jsonify(data)
+    return jsonify(data)
 
-# @api_bp.route('/api/sales_today')
-# def sales_today():
-#     today = date.today()
-#     sales = db.session.query(func.sum(DetailSale.amount)).join(Sale).filter(Sale.sale_date >= today).scalar() or 0
-#     return jsonify({'total_sold': sales})
+@api_bp.route('/api/dashboard_employee')
+def dashboard_employee():
+    today = date.today()
+    sales = db.session.query(func.sum(DetailSale.amount)).join(Sale).filter(Sale.sale_date >= today).scalar() or 0
+    return jsonify({'total_sold': sales})
 
 #################### user ######################
 
@@ -174,6 +174,25 @@ def delete_user(id):
     flash('User berhasil dihapus.', 'success')
     return redirect(url_for('api_bp.users'))
 
+@api_bp.route('/users/export_excel')
+def export_users_excel():
+    users = User.query.all()
+    data = []
+
+    for user in users:
+            data.append({
+                "Name": user.name if user.name else "Customer",
+                "Role": user.role if user.role else "-",
+            })
+
+    df = pd.DataFrame(data)
+
+    output = BytesIO()
+    with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+        df.to_excel(writer, index=False, sheet_name='Data User')
+    output.seek(0)
+
+    return send_file(output, download_name="data_user.xlsx", as_attachment=True)
 
 ################################# product ######################
 
@@ -181,7 +200,7 @@ def delete_user(id):
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in current_app.config['ALLOWED_EXTENSIONS']
 
-@api_bp.route('/productss')
+@api_bp.route('/products')
 def products():
     products = Product.query.all()
     return render_template('product/products.html', products=products)
@@ -264,10 +283,30 @@ def delete_product(id):
     
     return redirect(url_for('api_bp.products'))
 
+@api_bp.route('/products/export_excel')
+def export_products_excel():
+    products = Product.query.all()
+    data = []
+
+    for product in products:
+            data.append({
+                "Name": product.name if product.name else "Customer",
+                "Price": product.price if product.price else "-",
+                "Stock": product.stock if product.stock else "-",
+            })
+
+    df = pd.DataFrame(data)
+
+    output = BytesIO()
+    with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+        df.to_excel(writer, index=False, sheet_name='Data Product')
+    output.seek(0)
+
+    return send_file(output, download_name="data_product.xlsx", as_attachment=True)
 ################# sale ####################
 
 # Tampilkan daftar penjualan
-@api_bp.route('/saless', endpoint='saless')
+@api_bp.route('/sales', endpoint='sales')
 @login_required
 def sales():
     sales = Sale.query.order_by(Sale.sale_date.desc()).all()

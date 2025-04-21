@@ -30,7 +30,7 @@
     </div>
 
     <div class="mb-3" id="points_section">
-        <label>Tambahkan Poin (10% dari total pembelian)</label>
+        <label>Tambahkan Poin (1% dari total pembelian)</label>
         <input type="number" name="customer_point" id="customer_point" class="form-control" value="0" readonly>
     </div>
 
@@ -138,7 +138,7 @@
             document.getElementById("point_used").value = currentCustomerPoints;
         } else {
             document.getElementById("point_used").value = 0;
-            document.getElementById("customer_point").value = Math.floor(totalPrice * 0.1);
+            document.getElementById("customer_point").value = Math.floor(totalPrice * 0.01);
         }
 
         const warning = document.getElementById("pay_warning");

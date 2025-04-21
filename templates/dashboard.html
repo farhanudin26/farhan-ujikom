@@ -84,11 +84,11 @@
         </div>
         
         <ul>
-            <li><a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-            <li><a href="#"><i class="fas fa-box"></i> Products</a></li>
-            <li><a href="#"><i class="fas fa-shopping-cart"></i> Sales</a></li>            
+            <li><a href="{{url_for("dashboard")}}"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+            <li><a href="{{url_for("api_bp.products")}}"><i class="fas fa-box"></i> Products</a></li>
+            <li><a href="{{url_for("api_bp.sales")}}"><i class="fas fa-shopping-cart"></i> Sales</a></li>            
             {% if current_user.role == 'admin' %}
-            <li><a href="{{ url_for('api_bp.users') }}"><i class="fas fa-users"></i> Users</a></li>
+            <li><a href="{{url_for("api_bp.users")}}"><i class="fas fa-users"></i> Users</a></li>
             {% endif %}
             <li><a href="{{ url_for("logout") }}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
         </ul>
@@ -96,10 +96,10 @@
 
     <!-- Main Content -->
     <div class="dashboard-container">
-        <h2>Welcome, {{ current_user.name }}</h2>
+        <!-- <h2>Welcome, {{ current_user.name }}</h2> -->
 
         {% if current_user.role == 'admin' %}
-            <p>Data produk yang terjual</p>
+            <strong><p>Data produk yang terjual</p></strong>
 
             <div class="charts-container">
                 <div class="chart-wrapper">
@@ -125,7 +125,7 @@
 
     {% if current_user.role == 'admin' %}
     <script>
-        fetch("#")
+        fetch("{{ url_for('api_bp.pie_chart_data') }}")
             .then(response => response.json())
             .then(data => {
                 const productLabels = data.map(product => product.name);
@@ -199,7 +199,7 @@
             })
             .catch(error => console.error("Error fetching pie chart data:", error));
 
-        fetch("#")
+        fetch("{{ url_for('api_bp.bar_chart_data') }}")
         .then(response => response.json())
         .then(data => {
             const today = new Date();
@@ -284,7 +284,7 @@
 
     {% if current_user.role == 'employee' %}
     <script>
-        fetch("#")
+        fetch("{{ url_for('api_bp.dashboard_employee') }}")
             .then(response => response.json())
             .then(data => {
                 const totalSoldToday = data.total_sold || 0;

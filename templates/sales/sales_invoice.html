@@ -7,7 +7,7 @@
 
 <div class="container mt-4">
     <nav class="mb-3">
-        <a href="#">← Kembali ke Daftar Penjualan</a>
+        <a href="{{url_for("api_bp.sales")}}">← Kembali ke Daftar Penjualan</a>
     </nav>
     <h2 class="fw-bold">Print Invoice</h2>
 
@@ -38,24 +38,15 @@
                 </tr>
             </thead>
             {% set point_used = sale.point or 0 %}
-            {% set remaining_point = point_used %}
+            <!-- {% set remaining_point = point_used %} -->
             <tbody>
                 {% for d in details %}
-                    {% set item_price = d.product.price %}
-                    {% set subtotal = item_price * d.amount %}
-                    {% if loop.first and remaining_point > 0 %}
-                        {% set adjusted_subtotal = subtotal - remaining_point %}
-                        {% set adjusted_subtotal = adjusted_subtotal if adjusted_subtotal > 0 else 0 %}
-                        {% set remaining_point = 0 %}
-                    {% else %}
-                        {% set adjusted_subtotal = subtotal %}
-                    {% endif %}
-                    <tr>
-                        <td>{{ d.product.name }}</td>
-                        <td>Rp. {{ "{:,.0f}".format(item_price).replace(',', '.') }}</td>
-                        <td>{{ d.amount }}</td>
-                        <td>Rp. {{ "{:,.0f}".format(adjusted_subtotal).replace(',', '.') }}</td>
-                    </tr>
+                <tr>
+                    <td>{{ d.product.name }}</td>
+                    <td>Rp {{ "{:,.0f}".format(d.product.price).replace(',', '.') }}</td>
+                    <td>{{ d.amount }}</td>
+                    <td>Rp {{ "{:,.0f}".format(d.subtotal).replace(',', '.') }}</td>
+                </tr>
                 {% endfor %}
             </tbody>
         </table>
@@ -71,15 +62,17 @@
             </div>
             <div class="col-md-4 text-end">
                 <div class="bg-dark text-white p-3 rounded text-nowrap">
-                    <h5 class="m-0">TOTAL</h5>
+                    <h5 class="m-0">TOTAL</h5> 
+                    {% if use_point and non_member %}
+                    <strike><h2 class="m-0">Rp. {{ "{:,.0f}".format((sale.total_price or 0)).replace(',', '.')}}</h2></strike>
+                    {% endif %}
                     <h2 class="m-0">Rp. {{ "{:,.0f}".format((sale.total_price or 0) - (sale.point or 0)).replace(',', '.') }}</h2>
                 </div>
-            </div>
-            
+            </div>   
         </div>
         <div class="mt-4 d-flex gap-2">
-            <a href="#" class="btn btn-primary">Unduh PDF</a>
-            <a href="#" class="btn btn-success">Selesai</a>
+            <a href="{{url_for("api_bp.sales_invoice_pdf",sale_id = sale.id)}}" class="btn btn-primary">Unduh PDF</a>
+            <a href="{{url_for("api_bp.sales")}}" class="btn btn-success">Selesai</a>
         </div>
     </div>
 </div>
