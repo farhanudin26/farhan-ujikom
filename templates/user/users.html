@@ -18,7 +18,7 @@
         </div>
         
         <ul>
-                <li><a href="{{url_for("dashboard")}}"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                    <li><a href="{{url_for("dashboard")}}"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
                 <li><a href="{{url_for("api_bp.products")}}"><i class="fas fa-box"></i> Products</a></li>
                 <li><a href="{{url_for("api_bp.sales")}}"><i class="fas fa-shopping-cart"></i> Sales</a></li>            
                 {% if current_user.role == 'admin' %}

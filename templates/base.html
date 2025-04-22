@@ -20,29 +20,29 @@
 
         <ul class="nav flex-column">
             <li class="nav-item">
-                <a class="nav-link text-white" href="#">
+                <a class="nav-link text-white" href="{{url_for("dashboard")}}">
                     <i class="bi bi-house-door me-2"></i> Dashboard
                 </a>
             </li>
             {% if current_user.role == 'admin' %}
             <li class="nav-item">
-                <a class="nav-link text-white" href="#">
+                <a class="nav-link text-white" href="{{url_for("api_bp.users")}}">
                     <i class="bi bi-person me-2"></i> User
                 </a>
             </li>
             {% endif %}
             <li class="nav-item">
-                <a class="nav-link text-white" href="#">
-                    <i class="bi bi-cart me-2"></i> Pembelian
+                <a class="nav-link text-white" href="{{url_for("api_bp.sales")}}">
+                    <i class="bi bi-cart me-2"></i> Penjualan
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link text-white" href="#">
+                <a class="nav-link text-white" href="{{url_for("api_bp.products")}}">
                     <i class="bi bi-box-seam me-2"></i> Produk
                 </a>
             </li>
             <li class="nav-item mt-3">
-                <a class="btn btn-danger w-100" href="#">
+                <a class="btn btn-danger w-100" href="{{ url_for("logout") }}">
                     <i class="bi bi-box-arrow-right me-2"></i> Logout
                 </a>
             </li>

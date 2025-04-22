@@ -4,65 +4,101 @@
     <meta charset="UTF-8">
     <title>Invoice #{{ sale.id }}</title>
     <style>
-            body {
-                font-family: DejaVu Sans, sans-serif;
-                font-size: 12px;
-            }
-            h2, h3 {
-                margin: 0;
-            }
-            .info {
-                margin-bottom: 20px;
-            }
-            table {
-                width: 100%;
-                border-collapse: collapse;
-                margin-bottom: 15px;
-            }
-            th, td {
-                padding: 8px;
-                border: 1px solid #000;
-            }
-            th {
-                background-color: #eee;
-            }
-            .total {
-                background-color: #f1f1f1;
-            }
-            .text-right {
-                text-align: right;
-            }
-            .center {
-                text-align: center;
-            }
-            .thanks {
-                margin-top: 40px;
-                text-align: center;
-                font-weight: bold;
-            }
-        </style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 12px;
+            color: #333;
+            margin: 40px;
+        }
+        h1, h2, h3 {
+            margin: 0;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            font-size: 24px;
+            color: #2c3e50;
+        }
+        .header p {
+            font-size: 12px;
+            color: #777;
+        }
+        .info, .total-box {
+            margin-bottom: 25px;
+        }
+        .info p, .info div {
+            margin: 3px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ccc;
+            vertical-align: middle;
+        }
+        th {
+            background-color: #f8f8f8;
+            text-align: left;
+        }
+        .total-box {
+            border-top: 2px solid #666;
+            padding-top: 10px;
+        }
+        .total-box h2 {
+            margin: 5px 0;
+            color: #e74c3c;
+        }
+        .total-box strike {
+            color: #999;
+            font-size: 14px;
+        }
+        .thanks {
+            margin-top: 50px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .highlight {
+            background-color: #f1f1f1;
+            font-weight: bold;
+        }
+        .text-right {
+            text-align: right;
+        }
+        .center {
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
 
     <div class="header">
+        <!-- Ganti src logo dengan URL/logo asli jika ada -->
+        <!-- <img src="logo.png" alt="Logo" height="50"><br> -->
         <h1>Web Kasir</h1>
-        <p>Jl. Raya Wangun Kelurahan Sindangsari Bogor Timur | Telp: 0831-9263-0720</p>
+        <p>Jl. Raya Wangun Kelurahan Sindangsari, Bogor Timur | Telp: 0831-9263-0720</p>
     </div>
 
-    <h2>INVOICE PENJUALAN</h2>
+    <h2 style="text-align: center; margin-bottom: 20px;">INVOICE PENJUALAN</h2>
 
     <div class="info">
-        <p>Member Status : {{ 'Member' if sale.customer else 'Non Member' }}</p>
-        <div><strong>No Invoice:</strong> #{{ sale.id }}</div>
-        <div><strong>Tanggal:</strong> {{ sale.sale_date.strftime('%d %B %Y') }}</div>
-        <div><strong>Kasir:</strong> {{ sale.user.name if sale.user and sale.user.name else '-' }}</div>
+        <p><strong>Status:</strong> {{ 'Member' if sale.customer else 'Non Member' }}</p>
+        <p><strong>No Invoice:</strong> #{{ sale.id }}</p>
+        <p><strong>Tanggal:</strong> {{ sale.sale_date.strftime('%d %B %Y') }}</p>
+        <p><strong>Kasir:</strong> {{ sale.user.name if sale.user and sale.user.name else '-' }}</p>
+
         {% if customer %}
-            <div><strong>Member:</strong> {{ customer.no_hp }}</div>
-            <p>Nama Pelanggan : {{ sale.customer.name }}</p>
-            <div><strong>Poin Tersisa:</strong> {{ customer.point or 0 }}</div>
-            <div><strong>Member Sejak:</strong> {{ customer.created_at.strftime('%d %B %Y') if customer.created_at else '-' }}</div>
+            <p><strong>Nama Member:</strong> {{ sale.customer.name }}</p>
+            <p><strong>No HP:</strong> {{ customer.no_hp }}</p>
+            <p><strong>Poin Tersisa:</strong> {{ customer.point or 0 }}</p>
+            <p><strong>Member Sejak:</strong> {{ customer.created_at.strftime('%d %B %Y') if customer.created_at else '-' }}</p>
         {% else %}
-            <div><strong>Pelanggan:</strong> Non Member</div>
+            <p><strong>Pelanggan:</strong> Non Member</p>
         {% endif %}
     </div>
 
@@ -88,11 +124,17 @@
     </table>
 
     <div class="total-box">
-        <strike><h2 class="m-0">Rp. {{ "{:,.0f}".format((sale.total_price or 0)).replace(',', '.')}}</h2></strike>
-        <div><strong>Total harga :</strong><h2 class="m-0">Rp. {{ "{:,.0f}".format((sale.total_price or 0) - (sale.point or 0)).replace(',', '.') }}</h2></div>
-        <div><strong>Poin Digunakan:</strong> {{ sale.point or 0 }}</div>
-        <p><strong>Total Dibayar:</strong> Rp. {{ "{:,.0f}".format(sale.total_pay or 0).replace(',', '.') }}</p>
-        <div><strong>Kembalian:</strong> Rp {{ "{:,.0f}".format(sale.total_return or 0).replace(',', '.') }}</div>
+        {% if sale.point and sale.point > 0 %}
+            <p>Total Awal: <strike>Rp {{ "{:,.0f}".format(sale.total_price).replace(',', '.') }}</strike></p>
+        {% endif %}
+        <p><strong>Poin Digunakan:</strong> {{ sale.point or 0 }}</p>
+        <p><strong>Total Harga Setelah Poin:</strong> Rp {{ "{:,.0f}".format((sale.total_price or 0) - (sale.point or 0)).replace(',', '.') }}</p>
+        <p><strong>Total Dibayar:</strong> Rp {{ "{:,.0f}".format(sale.total_pay or 0).replace(',', '.') }}</p>
+        <p><strong>Kembalian:</strong> Rp {{ "{:,.0f}".format(sale.total_return or 0).replace(',', '.') }}</p>
+    </div>
+
+    <div class="thanks">
+        Terima kasih telah berbelanja!
     </div>
 
 </body>

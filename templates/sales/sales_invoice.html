@@ -63,9 +63,11 @@
             <div class="col-md-4 text-end">
                 <div class="bg-dark text-white p-3 rounded text-nowrap">
                     <h5 class="m-0">TOTAL</h5> 
-                    {% if use_point and non_member %}
-                    <strike><h2 class="m-0">Rp. {{ "{:,.0f}".format((sale.total_price or 0)).replace(',', '.')}}</h2></strike>
-                    {% endif %}
+                    {% if sale.point and sale.point > 0 %}
+                    <h2 class="m-0">
+                        <strike>Rp. {{ "{:,.0f}".format((sale.total_price or 0)).replace(',', '.') }}</strike>
+                    </h2>
+                {% endif %}
                     <h2 class="m-0">Rp. {{ "{:,.0f}".format((sale.total_price or 0) - (sale.point or 0)).replace(',', '.') }}</h2>
                 </div>
             </div>   
