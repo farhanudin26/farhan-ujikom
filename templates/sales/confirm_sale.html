@@ -1,61 +1,86 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<h2>Konfirmasi Penjualan</h2>
+<div class="container mt-4">
+    <div class="card shadow-lg border-0 rounded-4">
+        <div class="card-body">
+            <h2 class="text-center mb-4">Konfirmasi Penjualan</h2>
 
-<p><strong>Total Harga: Rp{{ "{:,.0f}".format(total_price).replace(",", ".") }}</strong></p>
-<p><strong>Poin Saat Ini: <span id="customer_points_display">0</span></strong></p>
-<p><strong>Harga Saat Ini: Rp<span id="current_price_display">{{ "{:,.0f}".format(total_price).replace(",", ".") }}</span></strong></p>
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <div class="border rounded-3 p-3 bg-light text-center">
+                        <h5>Total Harga</h5>
+                        <p class="fs-5 fw-bold text-primary">Rp{{ "{:,.0f}".format(total_price).replace(",", ".") }}</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="border rounded-3 p-3 bg-light text-center">
+                        <h5>Poin Saat Ini</h5>
+                        <p class="fs-5 fw-bold" id="customer_points_display">0</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="border rounded-3 p-3 bg-light text-center">
+                        <h5>Harga Setelah Poin</h5>
+                        <p class="fs-5 fw-bold text-success">Rp<span id="current_price_display">{{ "{:,.0f}".format(total_price).replace(",", ".") }}</span></p>
+                    </div>
+                </div>
+            </div>
 
-<form method="POST">
-    <div class="mb-3">
-        <label>Status Pelanggan</label>
-        <select name="customer_status" class="form-control" id="customer_status" onchange="toggleCustomerFields()" required>
-            <option value="member">Member</option>
-            <option value="non_member">Bukan Member</option>
-        </select>
-    </div>
+            <form method="POST">
+                <div class="mb-3">
+                    <label class="form-label">Status Pelanggan</label>
+                    <select name="customer_status" class="form-select" id="customer_status" onchange="toggleCustomerFields()" required>
+                        <option value="member">Member</option>
+                        <option value="non_member">Bukan Member</option>
+                    </select>
+                </div>
 
-    <div class="mb-3">
-        <label>Nama Pelanggan</label>
-        <input type="text" name="customer_name" id="customer_name" class="form-control" required>
-    </div>
+                <div class="mb-3">
+                    <label class="form-label">Nama Pelanggan</label>
+                    <input type="text" name="customer_name" id="customer_name" class="form-control" required>
+                </div>
 
-    <div class="mb-3">
-        <label>No HP</label>
-        <div class="input-group">
-            <input type="text" name="no_hp" id="no_hp" class="form-control" required>
-            <button type="button" class="btn btn-primary" onclick="checkPointsByPhone()">Cek Poin</button>
+                <div class="mb-3">
+                    <label class="form-label">Nomor HP</label>
+                    <div class="input-group">
+                        <input type="text" name="no_hp" id="no_hp" class="form-control" required>
+                        <button type="button" class="btn btn-outline-primary" onclick="checkPointsByPhone()">Cek Poin</button>
+                    </div>
+                </div>
+
+                <div class="mb-3" id="points_section">
+                    <label class="form-label">Tambahkan Poin (1% dari total pembelian)</label>
+                    <input type="number" name="customer_point" id="customer_point" class="form-control" value="0" readonly>
+                </div>
+
+                <div class="form-check mb-3" id="use_point_section">
+                    <input type="checkbox" class="form-check-input" name="use_point" id="use_point" value="1" onchange="calculateReturn()">
+                    <label class="form-check-label">Gunakan Poin (1 poin = Rp1)</label>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Total Bayar</label>
+                    <input type="number" name="total_pay" id="total_pay" class="form-control" required oninput="calculateReturn()">
+                    <div class="text-danger mt-1" id="pay_warning" style="display: none;">
+                        Total bayar tidak boleh kurang dari total harga saat ini!
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Kembalian</label>
+                    <input type="number" name="total_return" id="total_return" class="form-control" readonly required>
+                </div>
+
+                <input type="hidden" name="point_used" id="point_used" value="0">
+
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-success btn-lg">Simpan Penjualan</button>
+                </div>
+            </form>
         </div>
     </div>
-
-    <div class="mb-3" id="points_section">
-        <label>Tambahkan Poin (1% dari total pembelian)</label>
-        <input type="number" name="customer_point" id="customer_point" class="form-control" value="0" readonly>
-    </div>
-
-    <div class="form-check mb-3" id="use_point_section">
-        <input type="checkbox" class="form-check-input" name="use_point" id="use_point" value="1" onchange="calculateReturn()">
-        <label class="form-check-label">Gunakan Poin (1 poin = Rp1)</label>
-    </div>
-
-    <div class="mb-3">
-        <label>Total Bayar</label>
-        <input type="number" name="total_pay" id="total_pay" class="form-control" required oninput="calculateReturn()">
-        <div class="text-danger" id="pay_warning" style="display: none;">
-            Total bayar tidak boleh kurang dari total harga saat ini!
-        </div>
-    </div>
-
-    <div class="mb-3">
-        <label>Kembalian</label>
-        <input type="number" name="total_return" id="total_return" class="form-control" readonly required>
-    </div>
-
-    <input type="hidden" name="point_used" id="point_used" value="0">
-
-    <button type="submit" class="btn btn-success">Simpan Penjualan</button>
-</form>
+</div>
 
 <script>
     let currentCustomerPoints = 0;

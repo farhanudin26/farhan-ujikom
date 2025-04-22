@@ -1,23 +1,24 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<h2>Tambah Penjualan</h2>
+<h2 class="text-center mb-4">Tambah Penjualan</h2>
+
 <form method="POST">
-<!-- Tanggal Penjualan (readonly) -->
-<div class="mb-3">
-    <label for="sale_date" class="form-label">Tanggal Penjualan</label>
-    <input type="date" class="form-control" name="sale_date" value="{{ today }}" readonly required>
-</div>
+    <!-- Tanggal Penjualan (readonly) -->
+    <div class="mb-3">
+        <label for="sale_date" class="form-label">Tanggal Penjualan</label>
+        <input type="date" class="form-control" name="sale_date" value="{{ today }}" readonly required>
+    </div>
 
-
-    <h4>Pilih Produk</h4>
-    <div class="row" id="product-cards">
+    <h4 class="mb-4">Pilih Produk</h4>
+    
+    <div class="row row-cols-1 row-cols-md-3 g-4" id="product-cards">
         {% for product in products %}
-        <div class="col-md-4 mb-3">
-            <div class="card h-100">
+        <div class="col">
+            <div class="card shadow-sm h-100 border-light rounded">
                 <img src="{{ url_for('static', filename='uploads/products/' ~ product.image) }}" class="card-img-top" alt="{{ product.name }}" style="height: 200px; object-fit: cover;">
                 <div class="card-body">
-                    <h5 class="card-title">{{ product.name }}</h5>
+                    <h5 class="card-title text-truncate">{{ product.name }}</h5>
                     <p class="card-text mb-1">Stok: {{ product.stock }}</p>
                     <p class="card-text mb-2">Harga: Rp{{ "{:,.0f}".format(product.price).replace(",", ".") }}</p>
                     <div class="form-check">
@@ -32,11 +33,11 @@
     </div>
 
     <div class="mb-3">
-        <label>Total Harga</label>
+        <label for="total_price" class="form-label">Total Harga</label>
         <input type="number" name="total_price" id="total_price" class="form-control" readonly required>
     </div>
 
-    <button type="submit" class="btn btn-primary">Lanjut Konfirmasi</button>
+    <button type="submit" class="btn btn-success btn-lg w-100">Lanjut Konfirmasi</button>
 </form>
 
 <script>
