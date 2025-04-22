@@ -68,8 +68,26 @@ def bar_chart_data():
 @api_bp.route('/api/dashboard_employee')
 def dashboard_employee():
     today = date.today()
-    sales = db.session.query(func.sum(DetailSale.amount)).join(Sale).filter(Sale.sale_date >= today).scalar() or 0
-    return jsonify({'total_sold': sales})
+
+    # Total stok terjual hari ini
+    total_sold = db.session.query(func.sum(DetailSale.amount))\
+        .join(Sale)\
+        .filter(Sale.sale_date == today)\
+        .scalar() or 0
+
+    member_transactions = db.session.query(func.count(Sale.id))\
+        .filter(Sale.sale_date == today, Sale.customer_id.isnot(None))\
+        .scalar() or 0
+
+    non_member_transactions = db.session.query(func.count(Sale.id))\
+        .filter(Sale.sale_date == today, Sale.customer_id.is_(None))\
+        .scalar() or 0
+
+    return jsonify({
+        'total_sold': total_sold,
+        'total_member_transaction': member_transactions,
+        'total_non_member_transaction': non_member_transactions
+    })
 
 #################### user ######################
 
